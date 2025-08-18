@@ -1,40 +1,37 @@
-from PySide6.QtCore import QObject, Slot
-from PySide6.QtQml import QmlElement
-
-QML_IMPORT_NAME = "Function"
-
-QML_IMPORT_MAJOR_VERSION = 1
+from PySide6.QtCore import QObject, Property, Signal
 
 
-@QmlElement
+
 class Function(QObject):
-    def __init__(self, string, color = None):
-        self.string = string
-        self.color = color
-    
-    @Slot(str, result=str)
-    def getColor(self, s):
-        if s.lower() == "red":
-            return "#ef9a9a"
-        if s.lower() == "green":
-            return "#a5d6a7"
-        if s.lower() == "blue":
-            return "#90caf9"
-        return "white"
+    def __init__(self, string="", color="white", parent=None):
+        super().__init__(parent)
+        self._string = string
+        self._color = color
 
+    def getString(self):
+        return self._string
 
-    @Slot(str, result=str)
-    def getString(self, s):
-        return s.lower() == "italic"
+    def setString(self, value):
+        if self._string != value:
+            self._string = value
+            self.stringChanged.emit()
 
+    stringChanged = Signal()
+    string = Property(str, getString, setString, notify=stringChanged)
 
-    @Slot(str, result=bool)
-    def getBold(self, s):
-        return s.lower() == "bold"
+    def getColor(self):
+        color_map = {
+            "red": "#ef9a9a",
+            "green": "#a5d6a7",
+            "blue": "#90caf9",
+            "white": "white"
+        }
+        return color_map.get(self._color.lower(), "white")
 
+    def setColor(self, value):
+        if self._color != value:
+            self._color = value
+            self.colorChanged.emit()
 
-    @Slot(str, result=bool)
-
-    def getUnderline(self, s):
-
-        return s.lower() == "underline
+    colorChanged = Signal()
+    color = Property(str, getColor, setColor, notify=colorChanged)
