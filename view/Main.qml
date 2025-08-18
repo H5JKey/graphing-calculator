@@ -1,22 +1,13 @@
 import QtQuick
 import QtQuick.Window
+import QtQuick.Controls
+import Function
 
 Window {
     width: 640
     height: 480
     visible: true
     title: "NeDesmos"
-
-    Component {
-        id: functionDelegate
-        Text {
-            required property string string
-            text: string
-            font.pixelSize: 14
-            width: ListView.view.width
-            padding: 8
-        }
-    }
 
     ListView {
         id: listView
@@ -25,7 +16,17 @@ Window {
         anchors.left: parent.left
         clip: true
         model: functionsModel
-        delegate: functionDelegate
+        delegate: Component{
+            TextField {
+                required property Function function
+                text: function.string
+                placeholderText: "Enter your expression..."
+                font.pixelSize: 14
+                width: ListView.view.width
+                padding: 8
+                onAccepted: functionsModel.append(Function("", ""))
+            }
+        }
         
         highlight: Rectangle {
             color: "lightsteelblue"
@@ -33,6 +34,12 @@ Window {
         }
         
         focus: true
-        
     }
+
+    Rectangle {
+        border.width: 2
+        color: "transparent"
+        anchors.fill: listView
+    }
+
 }

@@ -6,6 +6,8 @@ import functionsModel
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
+#    ---->       path/to/venv/bin/python src/main.py
+
 
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
