@@ -34,6 +34,7 @@ class Function(QObject):
     def color(self, value):
         if self._color != value:
             self._color = value
+            print(value)
             self.colorChanged.emit()
 
     @Property(str, notify = showChanged)

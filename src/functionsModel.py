@@ -38,6 +38,14 @@ class FunctionsModel(QAbstractListModel):
         self._functions.insert(index, function.Function())
         self.endInsertRows()
 
+    @Slot(int)
+    def remove(self, index):
+        self.beginRemoveRows(QModelIndex(), index, index)
+        self._functions.pop(index)
+        self.endRemoveRows()
+        if not self._functions:
+            self.insert(0)
+
     @Slot(int, str)
     def setString(self, index, value):
         index = self.createIndex(index,0)

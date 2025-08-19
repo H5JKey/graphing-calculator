@@ -3,13 +3,19 @@ import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Shapes
+import QtQuick.Dialogs
 
 Window {
     width: 640
     height: 480
     visible: true
     title: "NeDesmos"
-
+    ColorDialog {
+        id: colorDialog
+        onAccepted: {
+            functionsModel.setColor(listView.selectedFunction, selectedColor)
+        }
+    }
     ListView {
         id: listView
         width: 200
@@ -17,6 +23,7 @@ Window {
         anchors.left: parent.left
         clip: true
         model: functionsModel
+        property int selectedFunction
         delegate: Rectangle{
             border.width: 0.5
             width: ListView.view.width
@@ -39,8 +46,15 @@ Window {
                         radius: 15
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: { 
-                                functionsModel.setShow(index, !showGraphic)
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            onClicked: {
+                                if (mouse.button === Qt.LeftButton) 
+                                    functionsModel.setShow(index, !showGraphic)
+                                else if (mouse.button === Qt.RightButton) {
+                                    colorDialog.open()
+                                    selectedFunction = index
+                                    colorDialog.selectedColor = graphicColor
+                                }
                             }
                         }
                     }
@@ -59,6 +73,20 @@ Window {
                     onTextChanged: functionsModel.setString(index, text)
                     onAccepted: {
                         functionsModel.insert(index+1);
+                    }
+                }
+                Text {
+                    font.pointSize: 12
+                    font.bold: true
+                    padding: 5
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    text: "x"
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            functionsModel.remove(index)
+                        }
                     }
                 }
             }
