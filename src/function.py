@@ -3,7 +3,7 @@ from PySide6.QtCore import QObject, Property, Signal
 
 
 class Function(QObject):
-    def __init__(self, string="", color="", show = False, parent=None):
+    def __init__(self, string="", color="#cc0000", show = True, parent=None):
         super().__init__(parent)
         self._string = string
         self._color = color
@@ -34,7 +34,6 @@ class Function(QObject):
     def color(self, value):
         if self._color != value:
             self._color = value
-            print(value)
             self.colorChanged.emit()
 
     @Property(str, notify = showChanged)

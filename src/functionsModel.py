@@ -53,6 +53,8 @@ class FunctionsModel(QAbstractListModel):
             return False
             
         self._functions[index.row()].string = value
+        if index.row() == len(self._functions)-1:
+            self.insert(len(self._functions))
 
         self.dataChanged.emit(index, index)
         return True

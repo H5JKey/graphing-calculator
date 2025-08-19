@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Shapes
 import QtQuick.Dialogs
+import QtGraphs
 
 Window {
     width: 640
@@ -12,8 +13,9 @@ Window {
     title: "NeDesmos"
     ColorDialog {
         id: colorDialog
+        property int selected
         onAccepted: {
-            functionsModel.setColor(listView.selectedFunction, selectedColor)
+            functionsModel.setColor(selected, selectedColor)
         }
     }
     ListView {
@@ -23,7 +25,6 @@ Window {
         anchors.left: parent.left
         clip: true
         model: functionsModel
-        property int selectedFunction
         delegate: Rectangle{
             border.width: 0.5
             width: ListView.view.width
@@ -52,8 +53,8 @@ Window {
                                     functionsModel.setShow(index, !showGraphic)
                                 else if (mouse.button === Qt.RightButton) {
                                     colorDialog.open()
-                                    selectedFunction = index
-                                    colorDialog.selectedColor = graphicColor
+                                    colorDialog.selected = index
+                                    colorDialog.selected = graphicColor
                                 }
                             }
                         }
@@ -94,11 +95,44 @@ Window {
         
         focus: true
     }
-
+    GraphsView {
+        id: graphics
+        anchors.left: listView.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        antialiasing: true
+        zoomAreaEnabled: true
+        axisX: ValueAxis {
+            min: -10
+            max: 10
+            gridVisible: false
+            subGridVisible: true
+        }
+        axisY: ValueAxis {
+            min: -10
+            max: 10
+            gridVisible: false
+            subGridVisible: true
+        }
+        Component.onCompleted: {
+            updateGraphics()
+        }
+       
+    }
     Rectangle {
         border.width: 2
         color: "transparent"
         anchors.fill: listView
     }
-
 }
+
+
+
+
+
+
+
+
+
+
