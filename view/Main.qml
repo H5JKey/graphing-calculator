@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
-import Function
+import QtQuick.Layouts
+import QtQuick.Shapes
 
 Window {
     width: 640
@@ -16,21 +17,51 @@ Window {
         anchors.left: parent.left
         clip: true
         model: functionsModel
-        delegate: Component{
-            TextField {
-                required property Function function
-                text: function.string
-                placeholderText: "Enter your expression..."
-                font.pixelSize: 14
-                width: ListView.view.width
-                padding: 8
-                onAccepted: functionsModel.append(Function("", ""))
+        delegate: Rectangle{
+            border.width: 0.5
+            width: ListView.view.width
+            height: 40
+            color: "transparent"
+            required property string functionString
+            required property string graphicColor
+            required property bool showGraphic
+            required property int index
+            RowLayout {
+                anchors.fill: parent
+                spacing: 5
+                Rectangle {
+                    Rectangle {
+                        border.width: 1
+                        height: 20
+                        width: 20
+                        color: (showGraphic) ? graphicColor : "transparent"
+                        anchors.centerIn: parent
+                        radius: 15
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: { 
+                                functionsModel.setShow(index, !showGraphic)
+                            }
+                        }
+                    }
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    width: 30
+                    border.width: 0.5
+                }
+                TextField {
+                    Layout.fillWidth: true
+                    text: functionString
+                    placeholderText: "f(x) = "
+                    font.pixelSize: 14
+
+                    padding: 8
+                    onTextChanged: functionsModel.setString(index, text)
+                    onAccepted: {
+                        functionsModel.insert(index+1);
+                    }
+                }
             }
-        }
-        
-        highlight: Rectangle {
-            color: "lightsteelblue"
-            radius: 2
         }
         
         focus: true
