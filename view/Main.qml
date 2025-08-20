@@ -127,8 +127,8 @@ Window {
     Column {
     anchors.right: parent.right
     anchors.top: parent.top
-    anchors.margins: 5 // Добавить отступ от краев
-    spacing: 2 // Увеличил spacing для лучшего вида
+    anchors.margins: 5
+    spacing: 2
     
     Button {
         font.bold: true
@@ -163,7 +163,6 @@ Window {
         height: 30
         text: ""
         onClicked: {
-            // Сброс к начальному виду
             graphsView.axisX.min = -10;
             graphsView.axisX.max = 10;
             graphsView.axisY.min = -10;
