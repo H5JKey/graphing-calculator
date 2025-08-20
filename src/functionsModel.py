@@ -1,4 +1,4 @@
-from PySide6.QtCore import QAbstractListModel, Qt, QModelIndex, QObject, Slot
+from PySide6.QtCore import QAbstractListModel, Qt, QModelIndex, QObject, Slot, QPoint
 import function
 
 class FunctionsModel(QAbstractListModel):
@@ -81,3 +81,36 @@ class FunctionsModel(QAbstractListModel):
 
         self.dataChanged.emit(index, index)
         return True
+    
+    @Slot(int, result = str)
+    def getString(self, index):
+        index = self.createIndex(index,0)
+        if not index.isValid():
+            return
+
+        return self._functions[index.row()].string
+    
+
+    @Slot(int, result = str)
+    def getColor(self, index):
+        index = self.createIndex(index,0)
+        if not index.isValid():
+            return
+        
+        return self._functions[index.row()].color
+    
+
+    @Slot(int, result = bool)
+    def getShow(self, index):
+        index = self.createIndex(index,0)
+        if not index.isValid():
+            return
+
+        return self._functions[index.row()].show
+    
+    @Slot(int, float, float, result = list)
+    def calculatePoints(self, index, xMin, xMax):
+        index = self.createIndex(index,0)
+        if not index.isValid():
+            return
+        return self._functions[index.row()].calculatePoints(xMin, xMax)

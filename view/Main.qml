@@ -38,12 +38,13 @@ Window {
                 anchors.fill: parent
                 spacing: 5
                 Rectangle {
+                    Layout.alignment: Qt.AlignLeft
                     Rectangle {
+                        anchors.centerIn: parent
                         border.width: 1
                         height: 20
                         width: 20
                         color: (showGraphic) ? graphicColor : "transparent"
-                        anchors.centerIn: parent
                         radius: 15
                         MouseArea {
                             anchors.fill: parent
@@ -59,8 +60,6 @@ Window {
                             }
                         }
                     }
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
                     width: 30
                     border.width: 0.5
                 }
@@ -77,11 +76,10 @@ Window {
                     }
                 }
                 Text {
+                    Layout.alignment: Qt.AlignRight | Qt.AlignTop
                     font.pointSize: 12
                     font.bold: true
                     padding: 5
-                    anchors.top: parent.top
-                    anchors.right: parent.right
                     text: "x"
                     MouseArea {
                         anchors.fill: parent
@@ -96,13 +94,14 @@ Window {
         focus: true
     }
     GraphsView {
-        id: graphics
+        id: graphsView
         anchors.left: listView.right
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        anchors.rightMargin: 0
         antialiasing: true
-        zoomAreaEnabled: true
+        zoomAreaEnabled: false
         axisX: ValueAxis {
             min: -10
             max: 10
@@ -116,17 +115,129 @@ Window {
             subGridVisible: true
         }
         Component.onCompleted: {
-            updateGraphics()
-        }
-       
+           updateGraphics();
+        }  
     }
     Rectangle {
         border.width: 2
         color: "transparent"
         anchors.fill: listView
     }
+
+    Column {
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.margins: 5 // Добавить отступ от краев
+    spacing: 2 // Увеличил spacing для лучшего вида
+    
+    Button {
+        font.bold: true
+        width: 30
+        height: 30
+        text: "+"
+        onClicked: {
+            graphsView.axisX.min = graphsView.axisX.min * 0.9;
+            graphsView.axisX.max = graphsView.axisX.max * 0.9;
+            graphsView.axisY.min = graphsView.axisY.min * 0.9;
+            graphsView.axisY.max = graphsView.axisY.max * 0.9;
+            updateGraphics();
+        }
+    }
+    
+    Button {
+        font.bold: true
+        width: 30
+        height: 30
+        text: "-"
+        onClicked: {
+            graphsView.axisX.min = graphsView.axisX.min * 1.1;
+            graphsView.axisX.max = graphsView.axisX.max * 1.1;
+            graphsView.axisY.min = graphsView.axisY.min * 1.1;
+            graphsView.axisY.max = graphsView.axisY.max * 1.1;
+            updateGraphics();
+        }
+    }
+    
+    Button {
+        width: 30
+        height: 30
+        text: ""
+        onClicked: {
+            // Сброс к начальному виду
+            graphsView.axisX.min = -10;
+            graphsView.axisX.max = 10;
+            graphsView.axisY.min = -10;
+            graphsView.axisY.max = 10;
+            updateGraphics();
+        }
+    }
 }
 
+
+    Connections {
+        target: functionsModel
+        onDataChanged: updateGraphics()
+        onRowsRemoved: updateGraphics()
+        onRowsInserted: updateGraphics()
+    }
+    function updateGraphics() {
+        while (graphsView.seriesList.length > 0) {
+            graphsView.removeSeries(graphsView.seriesList[0]);
+        }
+        const axisX = Qt.createQmlObject(`
+                import QtQuick
+                import QtGraphs
+                LineSeries {
+                    color: "black"
+                    width: 1
+                    XYPoint{x: graphsView.axisX.min; y: 0}
+                    XYPoint{x: graphsView.axisX.max; y: 0}
+                }
+                `,
+                graphsView
+        );
+        graphsView.addSeries(axisX);
+
+        const axisY = Qt.createQmlObject(`
+                import QtQuick
+                import QtGraphs
+                LineSeries {
+                    color: "black"
+                    width: 1
+                    XYPoint{x: 0; y: graphsView.axisX.min}
+                    XYPoint{x: 0; y: graphsView.axisX.max}
+                }
+                `,
+                graphsView
+        );
+        graphsView.addSeries(axisY);
+
+        
+
+
+        for (var i = 0; i < functionsModel.rowCount(); i++) {
+            var show = functionsModel.getShow(i);
+            if (!show) continue;
+            var functionColor = functionsModel.getColor(i);
+            const graphic = Qt.createQmlObject(`
+                import QtQuick
+                import QtGraphs
+                LineSeries {
+                    color: "${functionColor}"
+                    width: 2
+                }
+                `,
+                graphsView
+            );
+            const points = functionsModel.calculatePoints(i,graphsView.axisX.min, graphsView.axisX.max);
+            for (var j = 0; j<points.length; j++) {
+                graphic.append(points[j].x, points[j].y);
+            }
+            graphsView.addSeries(graphic);
+            
+        }
+    }
+}
 
 
 

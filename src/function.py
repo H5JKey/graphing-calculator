@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Property, Signal
+from PySide6.QtCore import QObject, Property, Signal, Slot, QPointF
 
 
 
@@ -8,6 +8,7 @@ class Function(QObject):
         self._string = string
         self._color = color
         self._show = show
+        self._pointsCount = 100
 
     stringChanged = Signal()
     colorChanged = Signal()
@@ -38,6 +39,7 @@ class Function(QObject):
 
     @Property(str, notify = showChanged)
     def show(self):
+        if self._string == "": return False
         return self._show
     
 
@@ -46,3 +48,14 @@ class Function(QObject):
         if self._show != value:
             self._show = value
             self.showChanged.emit()
+
+
+    def calculatePoints(self, xMin, xMax):
+        points = []
+        x = xMin
+        dx = (xMax - xMin) / self._pointsCount
+        while x<=xMax:
+            expr = self._string.replace('x', str(x))
+            points.append(QPointF(x, eval(expr)))
+            x+=dx
+        return points
