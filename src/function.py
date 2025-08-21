@@ -1,14 +1,17 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot, QPointF
+import sympy
 
 
 
 class Function(QObject):
     def __init__(self, string="", color="#cc0000", show = True, parent=None):
+        self._string = string
         super().__init__(parent)
         self._string = string
         self._color = color
         self._show = show
         self._pointsCount = 100
+        self.string = string
 
     stringChanged = Signal()
     colorChanged = Signal()
@@ -23,6 +26,14 @@ class Function(QObject):
     def string(self, value):
         if self._string != value:
             self._string = value
+            try:
+                self._variable = sympy.symbols('x')
+                self._expression = sympy.simplify(self._string)
+                self._evaluatingFunction = sympy.lambdify(self._variable, self._expression)
+            except:
+                pass
+
+
             self.stringChanged.emit()
     
 
@@ -55,7 +66,6 @@ class Function(QObject):
         x = xMin
         dx = (xMax - xMin) / self._pointsCount
         while x<=xMax:
-            expr = self._string.replace('x', str(x))
-            points.append(QPointF(x, eval(expr)))
+            points.append(QPointF(x, self._evaluatingFunction(x)))
             x+=dx
         return points

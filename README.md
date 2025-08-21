@@ -5,3 +5,4 @@ Simple desmos-like app made with python and pyQt
 
 # requirements
 - PySide6
+- SymPy

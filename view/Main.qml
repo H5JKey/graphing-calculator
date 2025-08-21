@@ -74,6 +74,10 @@ Window {
                     onAccepted: {
                         functionsModel.insert(index+1);
                     }
+                    background: Rectangle {
+                        color: transparent
+                        anchors.fill: parent
+                    }
                 }
                 Text {
                     Layout.alignment: Qt.AlignRight | Qt.AlignTop
